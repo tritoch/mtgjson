@@ -125,6 +125,107 @@ function ripSet(setName, cb)
 }
 exports.ripSet = ripSet;
 
+function ripLang(set, cb) {
+	base.info("====================================================================================================================");
+	base.info("Ripping langs from set: %s", set.name);
+
+	var cards = {};
+
+	tiptoe(
+		function prepareIds() {
+			base.info('Retrieving multiverseids list...');
+			var multiverseids = [];
+
+			set.cards.forEach(function(card) {
+				// Exclude basic lands
+				if (card.type.toLowerCase().startsWith("basic land"))
+					return;
+
+				// Card must have foreignNames entry
+				if (card.foreignNames) {
+					card.foreignNames.forEach(function(fvalue) {
+						multiverseids.push(fvalue.multiverseid);
+					});
+				}
+			});
+
+			base.info('Ids to process: %d', multiverseids.length);
+			this(null, multiverseids);
+		},
+		function processMultiverses(multiverseids) {
+			base.info("Processing multiverse ids...");
+			var cards = {};
+			var cb = this;
+			var idx = 0;
+			multiverseids.serialForEach(
+				function(multiverseid, subcb) {
+					base.info('%d/%d', ++idx, multiverseids.length);
+					tiptoe(
+						function getDocs() {
+							var url = urlUtil.setQueryParam(shared.buildMultiverseURL(multiverseid), "printed", "true");
+							shared.getURLAsDoc(url, this);
+						},
+						function docRetrieved(doc) {
+							var card = {};
+
+							var idPrefix = getCardPartIDPrefix(doc);
+							card.multiverseid = querystring.parse(url.parse(doc.querySelector(idPrefix + '_rightCol a#cardTextSwitchLink1').getAttribute('href')).query).multiverseid.trim();
+
+							// Text
+							// We're not worried about basic lands here. They are filtered out.
+							card.text = processTextBlocks(doc.querySelectorAll(idPrefix + "_textRow .value .cardtextbox")).trim();
+
+							// Flavor
+							var cardFlavor = processTextBlocks(doc.querySelectorAll(idPrefix + "_flavorRow .value .flavortextbox")).trim();
+							if(!cardFlavor)
+								cardFlavor = processTextBlocks(doc.querySelectorAll(idPrefix + "_flavorRow .value .cardtextbox")).trim();
+
+							if(cardFlavor)
+								card.flavor = cardFlavor;
+
+							// Only add the card to the list if we have something to write
+							if (card.text || card.flavor)
+								cards[card.multiverseid] = card;
+
+							this();
+						},
+						function finish(err) {
+							setImmediate(function() { subcb(err); });
+						}
+					);
+				},
+				function() {
+					cb(null, cards);
+				}
+			);
+		},
+		function updateCards(cards) {
+			//base.info(JSON.stringify(cards, null, ' '));
+			set.cards.forEach(function(enCard) {
+				if (!enCard.foreignNames) return;
+				enCard.foreignNames.forEach(function(feCard){
+					var mvid = feCard.multiverseid;
+					if (cards[mvid]) {
+						if (cards[mvid].text)
+							feCard.text = cards[mvid].text;
+						if (cards[mvid].flavor)
+							feCard.flavor = cards[mvid].flavor;
+					}
+				});
+			});
+			this();
+		},
+		function finish(err) {
+			if (err) {
+				//base.error("Error ripping: %s", set.name);
+				return setImmediate(function() { cb(err); });
+			}
+			setImmediate(cb);
+		}
+	);
+}
+exports.ripLang = ripLang;
+
 function processMultiverseids(multiverseids, cb)
 {
 	var cards = [];
@@ -132,59 +233,63 @@ function processMultiverseids(multiverseids, cb)
 
 	base.info("Processing %d multiverseids", multiverseids.unique().length);
 
-	multiverseids.unique().serialForEach(function(multiverseid, subcb)
-	{
-		tiptoe(
-			function getMultiverseUrls()
-			{
-				getURLsForMultiverseid(multiverseid, this);
-			},
-			function getMultiverseDocs(urls)
-			{
-				urls.forEach(function(multiverseURL)
+	multiverseids.unique().serialForEach(
+		function(multiverseid, subcb) {
+			tiptoe(
+				function getMultiverseUrls()
 				{
-					shared.getURLAsDoc(multiverseURL, this.parallel());
-					shared.getURLAsDoc(urlUtil.setQueryParam(multiverseURL, "printed", "true"), this.parallel());
-				}.bind(this));
-			},
-			function processMultiverseDocs()
-			{
-				Array.prototype.slice.call(arguments).forEachBatch(function(multiverseDoc, printedMultiverseDoc)
+					getURLsForMultiverseid(multiverseid, this);
+				},
+				function getMultiverseDocs(urls)
 				{
-					var newCards = [];
-					var multiverseDocCardParts = getCardParts(multiverseDoc);
-					var printedMultiverseDocCardParts = getCardParts(printedMultiverseDoc);
-					if(multiverseDocCardParts.length!==printedMultiverseDocCardParts.length)
+					urls.forEach(function(multiverseURL)
 					{
-						throw new Error("multiverseDocCardParts length [" + multiverseDocCardParts.length + "] does not equal printedMultiverseDocCardParts length [" + printedMultiverseDocCardParts.length + "]");
-					}
-
-					multiverseDocCardParts.forEach(function(cardPart, i)
+						shared.getURLAsDoc(multiverseURL, this.parallel());
+						shared.getURLAsDoc(urlUtil.setQueryParam(multiverseURL, "printed", "true"), this.parallel());
+					}.bind(this));
+				},
+				function processMultiverseDocs()
+				{
+					Array.prototype.slice.call(arguments).forEachBatch(function(multiverseDoc, printedMultiverseDoc)
 					{
-						var newCard = processCardPart(multiverseDoc, cardPart, printedMultiverseDoc, printedMultiverseDocCardParts[i]);
-						if(newCard.layout==="split" && i===1)
-							return;
+						var newCards = [];
+						var multiverseDocCardParts = getCardParts(multiverseDoc);
+						var printedMultiverseDocCardParts = getCardParts(printedMultiverseDoc);
+						if(multiverseDocCardParts.length!==printedMultiverseDocCardParts.length)
+						{
+							throw new Error("multiverseDocCardParts length [" + multiverseDocCardParts.length + "] does not equal printedMultiverseDocCardParts length [" + printedMultiverseDocCardParts.length + "]");
+						}
 
-						newCards.push(newCard);
-					});
+						multiverseDocCardParts.forEach(function(cardPart, i)
+						{
+							var newCard = processCardPart(multiverseDoc, cardPart, printedMultiverseDoc, printedMultiverseDocCardParts[i]);
+							if(newCard.layout==="split" && i===1)
+								return;
 
-					if(newCards.length===2 && newCards[0].layout==="double-faced")
-					{
-						var doubleFacedCardName = newCards[0].names.join(":::");
-						if(!doubleFacedCardNames.contains(doubleFacedCardName))
-							doubleFacedCardNames.push(doubleFacedCardName);
-						else
-							newCards = [];
-					}
+							newCards.push(newCard);
+						});
 
-					cards = cards.concat(newCards);
-				}, 2);
+						if(newCards.length===2 && newCards[0].layout==="double-faced")
+						{
+							var doubleFacedCardName = newCards[0].names.join(":::");
+							if(!doubleFacedCardNames.contains(doubleFacedCardName))
+								doubleFacedCardNames.push(doubleFacedCardName);
+							else
+								newCards = [];
+						}
 
-				this();
-			},
-			function finish(err) { setImmediate(function() { subcb(err); }); }
-		);
-	}, function(err) { return cb(err, cards); });
+						cards = cards.concat(newCards);
+					}, 2);
+
+					this();
+				},
+				function finish(err) { setImmediate(function() { subcb(err); }); }
+			);
+		},
+		function(err) {
+			return cb(err, cards);
+		}
+	);
 }
 
 function getCardPartIDPrefix(cardPart)
