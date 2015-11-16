@@ -579,6 +579,13 @@ exports.buildCacheFileURLs = function(card, cacheType, cb, fromCache)
 			{
 				urls.push(exports.buildMultiverseLegalitiesURL(card.multiverseid));
 			}
+			else if(cacheType === "fulllanguages") {
+				if (card.foreignNames) {
+					card.foreignNames.forEach(function(fEntry) {
+						urls.push(urlUtil.setQueryParam(exports.buildMultiverseURL(fEntry.multiverseid), 'printed', 'true'));
+					});
+				}
+			}
 
 			this(undefined, urls);
 		},
@@ -587,8 +594,10 @@ exports.buildCacheFileURLs = function(card, cacheType, cb, fromCache)
 			if(err)
 				throw err;
 			
-			if(!urls || !urls.length)
-				throw new Error("No URLs for: %s %s", cacheType, card.multiverseid);
+			if(!urls || !urls.length) {
+				base.error('No URLs for: ' + cacheType + ' (' + card.multiverseid + ')');
+				//throw new Error('No URLs for: ' + cacheType + ' (' + card.multiverseid + ')');
+			}
 			
 			if(urls.some(function(url) { return url.length===0; }))
 				throw new Error("Invalid urls for: %s %s [%s]", cacheType, card.multiverseid, urls.join(", "));

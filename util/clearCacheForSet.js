@@ -8,15 +8,19 @@ var base = require("xbase"),
 	path = require("path"),
 	tiptoe = require("tiptoe");
 
-if(process.argv.length<4)
-{
-	base.error("Usage: node %s <all|oracle|original|languages|printings|legalities|mcilist|listings> <set codes>", process.argv[1]);
+if(process.argv.length < 4) {
+	base.error("Usage: node %s <all|oracle|original|languages|fulllanguages|printings|legalities|mcilist|listings> <set codes>", process.argv[1]);
 	process.exit(1);
 }
 
-var VALID_TYPES = ["oracle", "original", "languages", "printings", "legalities", "mcilist", "listings"];
+/*
+ * fulllanguages - deletes all data retrieved from foreignLanguages multiverseids.
+ *
+ */
+var VALID_TYPES = ['oracle', 'original', 'languages', 'printings', 'legalities', 'mcilist', 'listings', 'fulllanguages'];
+var ALL_TYPES = VALID_TYPES.filter(function(value) { if (value == 'fulllanguages') return(0); return(1); });	// Remove 'fulllanguages'
 
-var cacheTypes = process.argv[2].toLowerCase()==="all" ? VALID_TYPES : Array.toArray(process.argv[2]);
+var cacheTypes = process.argv[2].toLowerCase()==="all" ? ALL_TYPES : Array.toArray(process.argv[2]);
 cacheTypes.serialForEach(function(cacheType, cb)
 {
 	if(!VALID_TYPES.contains(cacheType))
