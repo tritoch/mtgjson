@@ -220,7 +220,9 @@ function ripLang(set, cb) {
 				//base.error("Error ripping: %s", set.name);
 				return setImmediate(function() { cb(err); });
 			}
-			setImmediate(cb);
+			setImmediate(function(){
+				cb(null, set)
+			});
 		}
 	);
 }
