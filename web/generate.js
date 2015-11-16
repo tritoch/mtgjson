@@ -127,6 +127,14 @@ tiptoe(
 						}
 					}
 
+					// Remove extra foreignNames for now
+					if (fieldName === "foreignNames" && fieldValue) {
+						fieldValue.forEach(function(value) {
+							if(value.text) delete(value.text);
+							if(value.flavor) delete(value.flavor);
+						});
+					}
+
 					previousSeenSetCodes[card.name][fieldName].push(setWithExtras.code);
 					
 					allCardsWithExtras[card.name][fieldName] = fieldValue;
