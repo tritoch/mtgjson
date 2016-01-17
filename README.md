@@ -22,6 +22,7 @@ Setup
     cd node_modules
     ln -s ../shared/C.js
     ln -s ../shared/shared.js
+    ln -s ../shared/rip.js
     cd ..
     # See 'Other' below
 

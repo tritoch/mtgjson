@@ -6,7 +6,7 @@ var base = require("xbase"),
 	path = require("path"),
 	shared = require("shared"),
 	tiptoe = require("tiptoe"),
-	rip = require("./rip.js"),
+	rip = require("rip"),
 	urlUtil = require("xutil").url;
 
 var langRef = {
