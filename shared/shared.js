@@ -759,9 +759,11 @@ exports.updateStandardForCard = function(card) {
  * 1.1   If they both have a number, they are compared and sorted accordingly.
  * 1.1.1 If the number exists and is the same, compare multiverseIDs
  * 1.2   If there are no numbers, compare the names.
- * 2.    The foreignNames array is sorted by the language name
- * 3.    The legalities are sorted by format name
- * 4.    Each key value of the card is sorted.
+ * 2.    Sort tokens (by name first, then ID)
+ * 2.1.  Sort reverseRelated
+ * 3.    The foreignNames array is sorted by the language name
+ * 4.    The legalities are sorted by format name
+ * 5.    Each key value of the card is sorted.
  *
  * 99. Finally, the file is saved to the <ROOT>/json/<SETNAME>.json file.
  */
@@ -784,9 +786,26 @@ exports.saveSet = function(set, callback) {
 		return(ret);
 	});
 
+	// 2. Sort Tokens
+	set.tokens.sort(function(a, b) {
+		if (a.name == b.name) {
+			return(a.id.localeCompare(b.id));
+		}
+
+		return(a.name.localeCompare(b.name));
+	});
+
+	// 2.1 Sort Token reverse-related
+	set.tokens.forEach(function(token) {
+		if (!token.reverseRelated)
+			return;
+
+		token.reverseRelated.sort();
+	});
+
 	// Sort internal card stuff
 	set.cards.forEach(function(card) {
-		// 2. Foreign Names
+		// 3. Foreign Names
 		if (card.foreignNames)
 			card.foreignNames.sort(function(a, b){
 				var ret = a.language.localeCompare(b.language)
@@ -796,13 +815,13 @@ exports.saveSet = function(set, callback) {
 				return(ret);
 			});
 
-		// 3. Legalities
+		// 4. Legalities
 		if (card.legalities)
 			card.legalities.sort(function(a, b){
 				return(a.format.localeCompare(b.format));
 			});
 
-		// 4. Sort card properties
+		// 5. Sort card properties
 		Object.keys(card).sort().forEach(function(key) {
 			var value = card[key];
 			delete card[key];

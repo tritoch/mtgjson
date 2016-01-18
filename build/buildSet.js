@@ -7,6 +7,7 @@ var base = require("xbase"),
 	path = require("path"),
 	shared = require("shared"),
 	tiptoe = require("tiptoe"),
+	hash = require("mhash"),
 	rip = require("rip");
 
 var setsToDo = shared.getSetsToDo();
@@ -15,17 +16,14 @@ setsToDo.removeAll(C.SETS_NOT_ON_GATHERER.concat(shared.getMCISetCodes()));
 
 base.info("Doing sets: %s", setsToDo);
 
-setsToDo.serialForEach(function(arg, subcb)
-{
+setsToDo.serialForEach(function(arg, subcb) {
 	var targetSet = C.SETS.mutateOnce(function(SET) { if(SET.name.toLowerCase()===arg.toLowerCase() || SET.code.toLowerCase()===arg.toLowerCase()) { return SET; } });
-	if(!targetSet)
-	{
+	if(!targetSet) {
 		base.error("Set %s not found!", arg);
 		return setImmediate(subcb);
 	}
 
-	if(targetSet.isMCISet)
-	{
+	if(targetSet.isMCISet) {
 		base.error("Set %s is an MCI set, use importMCISet.js instead.", arg);
 		return setImmediate(subcb);
 	}
@@ -35,6 +33,7 @@ setsToDo.serialForEach(function(arg, subcb)
 			rip.ripSet(targetSet.name, this);
 		},
 		function tokens(set) {
+			base.info("Fixing tokens.");
 			// Fixes tokens before saving.
 			var tokens = [];
 			var cards = [];
@@ -62,6 +61,16 @@ setsToDo.serialForEach(function(arg, subcb)
 				tokens.forEach(function(token) {
 					if (token.sets.indexOf(set.code) >= 0) {
 						// TODO: Check if token already exists
+
+						if (!token.imageName) {
+							base.warn("Token '%s' has no imageName.", token.name);
+							token.imageName = token.name.toLowerCase();
+						}
+
+						if (!token.id) {
+							token.id = hash("sha1", (set.code + token.name + token.imageName));
+						}
+
 						set.tokens.push(token);
 					}
 				});
@@ -73,6 +82,7 @@ setsToDo.serialForEach(function(arg, subcb)
 			shared.saveSet(set, this);
 		},
 		function finish(err) {
+			base.info("finish '%s'.", targetSet.name);
 			subcb(err);
 		}
 	);
