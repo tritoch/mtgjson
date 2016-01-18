@@ -36,6 +36,9 @@ setsToDo.serialForEach(function(arg, subcb) {
 			base.info("Fixing tokens.");
 			// Fixes tokens before saving.
 			var tokens = [];
+			if (set.tokens)
+				tokens = set.tokens;
+
 			var cards = [];
 
 			// Move tokens to their place.
@@ -70,6 +73,18 @@ setsToDo.serialForEach(function(arg, subcb) {
 						if (!token.id) {
 							token.id = hash("sha1", (set.code + token.name + token.imageName));
 						}
+
+						// Make reverse-related meaningful for this set.
+						var rr = token.reverseRelated.map(function(cardName) {
+							var i, l = set.cards.length;
+							for (i = 0; i < l; i++) {
+								var currentCard = set.cards[i];
+								if (currentCard.name.toLowerCase() === cardName.toLowerCase())
+									return(currentCard.multiverseid);
+							}
+						});
+
+						token.reverseRelated = rr.filter(function(mvid) { if(mvid) return(mvid); });
 
 						set.tokens.push(token);
 					}
