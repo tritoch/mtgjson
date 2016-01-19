@@ -65,13 +65,20 @@ setsToDo.serialForEach(function(arg, subcb) {
 					if (token.sets.indexOf(set.code) >= 0) {
 						// TODO: Check if token already exists
 
-						if (!token.imageName) {
-							base.warn("Token '%s' has no imageName.", token.name);
-							token.imageName = token.name.toLowerCase();
+						var curInfo = null;
+						var i, l = token.urls.length;
+						for (i = 0; i < l; i++) {
+							if (token.urls[i].set === set.code) {
+								curInfo = token.urls[i];
+							}
 						}
 
-						if (!token.id) {
-							token.id = hash("sha1", (set.code + token.name + token.imageName));
+						if (curInfo == null) {
+							console.error("Missing token information!")
+						}
+						else {
+							token.imageName = curInfo.imageName;
+							token.id = curInfo.id;
 						}
 
 						// Make reverse-related meaningful for this set.
@@ -83,6 +90,11 @@ setsToDo.serialForEach(function(arg, subcb) {
 									return(currentCard.multiverseid);
 							}
 						});
+
+						// Removed undesired fields
+						delete token.urls;
+
+						// TODO: Add to relevant cards.
 
 						token.reverseRelated = rr.filter(function(mvid) { if(mvid) return(mvid); });
 

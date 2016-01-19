@@ -1,6 +1,7 @@
 var fs = require('fs'),
 	path = require('path'),
 	hash = require("mhash"),
+	C = require('C'),
 	xml2js = require('xml2js');
 
 var parser = new xml2js.Parser();
@@ -27,8 +28,6 @@ fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, da
 	parser.parseString(data, function (err, result) {
 		var out = result.cockatrice_carddatabase.cards[0].card;
 
-		fs.writeFileSync(path.join(__dirname, '..', 'tokens', 'tokens-raw.json'), JSON.stringify(result, null, '  '));
-
 		out.forEach(function(token) {
 			[ 'name', 'type', 'text', 'manacost' ].forEach(function(x) {
 				if (token[x]) {
@@ -46,7 +45,6 @@ fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, da
 
 			// Trim name
 			token.name = token.name.replace(/ ?\([0-9]*\)/, '').trim();
-
 
 			if (!token.set) {
 				console.warn("Token has no set:");
@@ -87,6 +85,16 @@ fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, da
 
 			if (token.token)
 				delete token.token;
+
+			// fix Colors
+			if (token.color) {
+				token.colors = token.color.map(function(c) {
+					var color = C.SYMBOL_MANA[c.toLowerCase()][0];
+					color = color.charAt(0).toUpperCase() + color.slice(1);
+					return(color);
+				});
+				delete token.color;
+			}
 
 			// Make names consistent
 			if (token['reverse-related']) {
