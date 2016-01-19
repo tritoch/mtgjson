@@ -1,11 +1,33 @@
 var fs = require('fs'),
 	path = require('path'),
+	hash = require("mhash"),
 	xml2js = require('xml2js');
 
 var parser = new xml2js.Parser();
+var tokenNames = {};
+
+function getImageName(setCode, tokenName) {
+	tokenName = tokenName.toLowerCase().trim();
+	setCode = setCode.toLowerCase().trim();
+
+	if (!tokenNames.hasOwnProperty(setCode)) {
+		tokenNames[setCode] = {};
+	}
+
+	if (!tokenNames[setCode].hasOwnProperty(tokenName)) {
+		tokenNames[setCode][tokenName] = 1;
+		return(tokenName);
+	}
+
+	tokenNames[setCode][tokenName]++;
+	return(tokenName + tokenNames[setCode][tokenName]);
+}
+
 fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, data) {
 	parser.parseString(data, function (err, result) {
 		var out = result.cockatrice_carddatabase.cards[0].card;
+
+		fs.writeFileSync(path.join(__dirname, '..', 'tokens', 'tokens-raw.json'), JSON.stringify(result, null, '  '));
 
 		out.forEach(function(token) {
 			[ 'name', 'type', 'text', 'manacost' ].forEach(function(x) {
@@ -21,16 +43,37 @@ fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, da
 					}
 				}
 			});
+
+			// Trim name
+			token.name = token.name.replace(/ ?\([0-9]*\)/, '').trim();
+
+
 			if (!token.set) {
 				console.warn("Token has no set:");
 				console.warn(JSON.stringify(token, null, '  '));
 			}
 			else {
+				var tokenURLS = [];
 				var set = token.set.map(function(setInfo) {
+					if (!setInfo)
+						return;
+					if (!setInfo['_'])
+						return;
+					var url = setInfo['$']['picURL'];
+
+					var imageName = getImageName(setInfo['_'], token.name);
+
+					tokenURLS.push({
+						"set": setInfo['_'],
+						"url": url,
+						"imageName": imageName,
+						"id": hash("sha1", (setInfo['_'] + token.name + imageName))
+					});
 					return(setInfo['_']);
 				});
 				token.sets = set;
 				delete token.set;
+				token.urls = tokenURLS;
 			}
 
 			if (token.pt) {
@@ -51,7 +94,6 @@ fs.readFile(path.join(__dirname, '..', 'tokens', 'tokens.xml'), function(err, da
 				delete token['reverse-related'];
 			}
 
-			token.imageName = token.name.toLowerCase();
 		});
 
 		// Write json output
