@@ -959,6 +959,22 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Adverse Conditions</reverse-related>
+            <reverse-related>Blight Herder</reverse-related>
+            <reverse-related>Blisterpod</reverse-related>
+            <reverse-related>Brood Butcher</reverse-related>
+            <reverse-related>Brood Monitor</reverse-related>
+            <reverse-related>Call the Scions</reverse-related>
+            <reverse-related>Carrier Thrall</reverse-related>
+            <reverse-related>Catacomb Sifter</reverse-related>
+            <reverse-related>Drowner of Hope</reverse-related>
+            <reverse-related>Eldrazi Skyspawner</reverse-related>
+            <reverse-related>Eyeless Watcher</reverse-related>
+            <reverse-related>From Beyond</reverse-related>
+            <reverse-related>Grave Birthing</reverse-related>
+            <reverse-related>Incubator Drone</reverse-related>
+            <reverse-related>Spawning Bed</reverse-related>
+            <reverse-related>Void Attendant</reverse-related>
         </card>
         <card>
             <name>Eldrazi Scion (3)</name>
@@ -970,6 +986,22 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Adverse Conditions</reverse-related>
+            <reverse-related>Blight Herder</reverse-related>
+            <reverse-related>Blisterpod</reverse-related>
+            <reverse-related>Brood Butcher</reverse-related>
+            <reverse-related>Brood Monitor</reverse-related>
+            <reverse-related>Call the Scions</reverse-related>
+            <reverse-related>Carrier Thrall</reverse-related>
+            <reverse-related>Catacomb Sifter</reverse-related>
+            <reverse-related>Drowner of Hope</reverse-related>
+            <reverse-related>Eldrazi Skyspawner</reverse-related>
+            <reverse-related>Eyeless Watcher</reverse-related>
+            <reverse-related>From Beyond</reverse-related>
+            <reverse-related>Grave Birthing</reverse-related>
+            <reverse-related>Incubator Drone</reverse-related>
+            <reverse-related>Spawning Bed</reverse-related>
+            <reverse-related>Void Attendant</reverse-related>
         </card>
         <card>
             <name>Eldrazi Scion (4)</name>
@@ -980,6 +1012,22 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Adverse Conditions</reverse-related>
+            <reverse-related>Blight Herder</reverse-related>
+            <reverse-related>Blisterpod</reverse-related>
+            <reverse-related>Brood Butcher</reverse-related>
+            <reverse-related>Brood Monitor</reverse-related>
+            <reverse-related>Call the Scions</reverse-related>
+            <reverse-related>Carrier Thrall</reverse-related>
+            <reverse-related>Catacomb Sifter</reverse-related>
+            <reverse-related>Drowner of Hope</reverse-related>
+            <reverse-related>Eldrazi Skyspawner</reverse-related>
+            <reverse-related>Eyeless Watcher</reverse-related>
+            <reverse-related>From Beyond</reverse-related>
+            <reverse-related>Grave Birthing</reverse-related>
+            <reverse-related>Incubator Drone</reverse-related>
+            <reverse-related>Spawning Bed</reverse-related>
+            <reverse-related>Void Attendant</reverse-related>
         </card>
         <card>
             <name>Eldrazi Scion (5)</name>
@@ -990,6 +1038,22 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Adverse Conditions</reverse-related>
+            <reverse-related>Blight Herder</reverse-related>
+            <reverse-related>Blisterpod</reverse-related>
+            <reverse-related>Brood Butcher</reverse-related>
+            <reverse-related>Brood Monitor</reverse-related>
+            <reverse-related>Call the Scions</reverse-related>
+            <reverse-related>Carrier Thrall</reverse-related>
+            <reverse-related>Catacomb Sifter</reverse-related>
+            <reverse-related>Drowner of Hope</reverse-related>
+            <reverse-related>Eldrazi Skyspawner</reverse-related>
+            <reverse-related>Eyeless Watcher</reverse-related>
+            <reverse-related>From Beyond</reverse-related>
+            <reverse-related>Grave Birthing</reverse-related>
+            <reverse-related>Incubator Drone</reverse-related>
+            <reverse-related>Spawning Bed</reverse-related>
+            <reverse-related>Void Attendant</reverse-related>
         </card>
         <card>
             <name>Eldrazi Scion (6)</name>
@@ -1000,6 +1064,22 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Adverse Conditions</reverse-related>
+            <reverse-related>Blight Herder</reverse-related>
+            <reverse-related>Blisterpod</reverse-related>
+            <reverse-related>Brood Butcher</reverse-related>
+            <reverse-related>Brood Monitor</reverse-related>
+            <reverse-related>Call the Scions</reverse-related>
+            <reverse-related>Carrier Thrall</reverse-related>
+            <reverse-related>Catacomb Sifter</reverse-related>
+            <reverse-related>Drowner of Hope</reverse-related>
+            <reverse-related>Eldrazi Skyspawner</reverse-related>
+            <reverse-related>Eyeless Watcher</reverse-related>
+            <reverse-related>From Beyond</reverse-related>
+            <reverse-related>Grave Birthing</reverse-related>
+            <reverse-related>Incubator Drone</reverse-related>
+            <reverse-related>Spawning Bed</reverse-related>
+            <reverse-related>Void Attendant</reverse-related>
         </card>
         <card>
             <name>Eldrazi Spawn</name>
@@ -1036,6 +1116,20 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Awakening Zone</reverse-related>
+            <reverse-related>Brood Birthing</reverse-related>
+            <reverse-related>Corpsehatch</reverse-related>
+            <reverse-related>Dread Drone</reverse-related>
+            <reverse-related>Emrakul's Hatcher</reverse-related>
+            <reverse-related>Essence Feed</reverse-related>
+            <reverse-related>Growth Spasm</reverse-related>
+            <reverse-related>Kozilek's Predator</reverse-related>
+            <reverse-related>Nest Invader</reverse-related>
+            <reverse-related>Pawn of Ulamog</reverse-related>
+            <reverse-related>Rapacious One</reverse-related>
+            <reverse-related>Skittering Invasion</reverse-related>
+            <reverse-related>Spawning Breath</reverse-related>
+            <reverse-related>Spawnsire of Ulamog</reverse-related>
         </card>
         <card>
             <name>Eldrazi Spawn  </name>
@@ -1047,6 +1141,20 @@ Cloud Sprite can block only creatures with flying.</text>
             <tablerow>2</tablerow>
             <text>Sacrifice this creature: Add {C} to your mana pool.</text>
             <token>1</token>
+            <reverse-related>Awakening Zone</reverse-related>
+            <reverse-related>Brood Birthing</reverse-related>
+            <reverse-related>Corpsehatch</reverse-related>
+            <reverse-related>Dread Drone</reverse-related>
+            <reverse-related>Emrakul's Hatcher</reverse-related>
+            <reverse-related>Essence Feed</reverse-related>
+            <reverse-related>Growth Spasm</reverse-related>
+            <reverse-related>Kozilek's Predator</reverse-related>
+            <reverse-related>Nest Invader</reverse-related>
+            <reverse-related>Pawn of Ulamog</reverse-related>
+            <reverse-related>Rapacious One</reverse-related>
+            <reverse-related>Skittering Invasion</reverse-related>
+            <reverse-related>Spawning Breath</reverse-related>
+            <reverse-related>Spawnsire of Ulamog</reverse-related>
         </card>
         <card>
             <name>Elemental</name>
