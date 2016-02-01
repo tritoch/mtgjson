@@ -41,6 +41,7 @@ var exports = {};
 	var path = require('path');
 	var rimraf = require('rimraf');
 
+	var moment = require("moment");
 	var printUtil = require("xutil").print;
 	var dustUtil = require("xutil").dust;
 	var runUtil = require("xutil").run;
@@ -57,6 +58,16 @@ var exports = {};
 	var JSONP_PREFIX = "mtgjsoncallback(";
 	var JSONP_SUFFIX = ");";
 	var allData = null;
+
+
+	var DEBUG = false;
+
+	(function() {
+		var joined = process.argv.join(' ');
+
+		if (joined.match(/--debug/))
+			DEBUG = true;
+	})();
 
 	// Deletes and re-creates the JSON folder according to exports.outputPath
 	var setupJSONDir = function(callback) {
@@ -150,16 +161,23 @@ var exports = {};
 				saveFile(outPath + '.json', out, this);
 			},
 			function() {
-				var out = JSON.stringify(fullSet);
-				fullSize = printUtil.toSize(out.length, 0);
-				saveFile(outPath + '-x.json', out, this);
+				if (fullSet) {
+					var out = JSON.stringify(fullSet);
+					fullSize = printUtil.toSize(out.length, 0);
+					saveFile(outPath + '-x.json', out, this);
+				}
+				else
+					this();
 			},
 			// JSONP
 			function() {
 				saveFile(outPath + '.jsonp', jsonp(JSON.stringify(regularSet)), this);
 			},
 			function() {
-				saveFile(outPath + '-x.jsonp', jsonp(JSON.stringify(fullSet)), this);
+				if (fullSet)
+					saveFile(outPath + '-x.jsonp', jsonp(JSON.stringify(fullSet)), this);
+				else
+					this();
 			},
 			function(err) {
 				if (callback)
@@ -278,6 +296,8 @@ var exports = {};
 			setCodesNotOnGatherer : C.SETS_NOT_ON_GATHERER.join(", "),
 			analytics : "<scr" + "ipt>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-66983210-2', 'auto');ga('send', 'pageview');</scr" + "ipt>"
 		};
+
+		var changeLog = null;
 
 		tiptoe(
 			function () {
@@ -419,8 +439,59 @@ var exports = {};
 				);
 			},
 			function() {
+				// Load Changelog
+				fs.readFile(path.join(__dirname, 'changelog.json'), { encoding: 'utf8'}, this);
+			},
+			function(changelogData) {
+				changeLog = JSON.parse(changelogData);
+
+				dustData.changeLog = changeLog.map(function(o, i) {
+					o.whenAtom = moment(o.when, "YYYY-MM-DD").format("YYYY-MM-DDTHH:mm:ss");
+					o.whenSiteMap = o.when;
+					o.when = moment(o.when, "YYYY-MM-DD").format("MMM D, YYYY");
+					o.uniqueID = changeLog.length-i;
+					o.atomContent = "<p>Changes:<br><ul>" + o.changes.map(function(change) { return "<li>" + change + "</li>"; }).join("") + "</ul></p>";
+					return o;
+				});
+
+				dustData.changeLogAtom = dustData.changeLog.slice(0, 9);
+
+				dustData.lastUpdatedAtom = dustData.changeLog[0].whenAtom;
+				dustData.lastUpdated = dustData.changeLog[0].when;
+				dustData.lastUpdatedSiteMap = dustData.changeLog[0].whenSiteMap;
+				dustData.version = dustData.changeLog[0].version;
+				dustData.setSpecificFields = C.SET_SPECIFIC_FIELDS.sort().join(", ");
+
 				// Save Website Files
 				saveDust(dustData, this);
+			},
+			function() {
+				// Final JSON stuff
+				tiptoe(
+					function() {
+						// SetCodes.json
+						var setCodes = C.SETS.map(function(SET) { return(SET.code); });
+						saveSet('SetCodes', setCodes, null, this);
+					},
+					function() {
+						// SetList.json
+						var setList = C.SETS.map(function(SET) { return({ name : SET.name, code : SET.code, releaseDate : SET.releaseDate}); });
+						saveSet('SetList', setList, null, this);
+					},
+					function() {
+						// version-full.json
+						saveSet('version-full', { version: dustData.version }, null, this);
+					},
+					function() {
+						// version.json
+						saveSet('version', dustData.version, null, this);
+					},
+					function() {
+						// changelog.json
+						saveSet('changelog', changeLog, null, this);
+					},
+					this
+				);
 			},
 			function (err) {
 				if (err) {
