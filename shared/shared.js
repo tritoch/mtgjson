@@ -900,3 +900,28 @@ exports.processSet = function(setCode, processFunction, callback) {
 		}
 	);
 };
+
+exports.config = {
+	"cache"  : path.join(__dirname, '..', 'cache'),
+	"public" : path.join(__dirname, '..', 'public')
+};
+
+exports.loadConfig = function(callback) {
+	tiptoe(
+		function() {
+			fs.readFile(path.join(__dirname, 'config.json'), { encoding: 'utf8' }, this);
+		},
+		function(data) {
+			var config = JSON.parse(data);
+			Object.keys(config).forEach(function(key) {
+				exports.config[key] = config[key];
+			});
+		},
+		function(err) {
+			if (callback)
+				callback();
+		}
+	);
+};
+
+exports.loadConfig();

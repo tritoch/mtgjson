@@ -90,9 +90,12 @@ var exports = {};
 	};
 
 	// Module exposed variables
-	exports.outputPath = path.join(__dirname, '..', 'public');
+	exports.outputPath = shared.config['public'];
 	exports.jsonPath = path.join(__dirname, '..', 'json');
 
+	/**
+	 * Properly enclose jsonp file data
+	 */
 	var jsonp = function(setCode, data) {
 		return(JSONP_PREFIX + data + ', "' + setCode + '"' + JSONP_SUFFIX);
 	};
@@ -119,6 +122,13 @@ var exports = {};
 		);
 	};
 
+	// Strips "extra" info from given card
+	var stripCardInfo = function(card) {
+		C.EXTRA_FIELDS.forEach(function(EXTRA_FIELD) {
+			delete card[EXTRA_FIELD];
+		});
+	};
+
 	// Methods
 	exports.generate = function(callback) {
 		tiptoe(
@@ -139,72 +149,89 @@ var exports = {};
 				var allSets = {};
 				var allSetsWithExtras = {};
 
-				Object.keys(sets).forEachCallback(function(set, callback) {
-					var fullSet = sets[set];
+				tiptoe(
+					function() {
+						// Populate allSets and allSetsWithExtras
+						Object.keys(sets).forEachCallback(function(set, callback) {
+							var fullSet = sets[set];
 
-					delete fullSet.isMCISet;
-					delete fullSet.magicRaritiesCode;
-					delete fullSet.essentialMagicCode;
-					delete fullSet.useMagicRaritiesNumber;
-					
-					var regSet = base.clone(fullSet);
+							delete fullSet.isMCISet;
+							delete fullSet.magicRaritiesCode;
+							delete fullSet.essentialMagicCode;
+							delete fullSet.useMagicRaritiesNumber;
+							
+							var regSet = base.clone(fullSet, true);
 
-					// Strip out extras from regular set
-					regSet.cards.forEach(function(card) {
-						C.EXTRA_FIELDS.forEach(function(EXTRA_FIELD) {
-							delete card[EXTRA_FIELD];
+							// Strip out extras from regular set
+							regSet.cards.forEach(stripCardInfo);
+
+							// Save each individual set
+							tiptoe(
+								function() {
+									saveSet(set, regSet, fullSet, this);
+								},
+								function() {
+									if (set == 'CON')
+										saveSet('_CON', regSet, fullSet, this);
+									else
+										this();
+								},
+								function(err) {
+									allSets[set] = regSet;
+									allSetsWithExtras[set] = fullSet;
+
+									callback(err);
+								}
+							);
+						},
+						this);
+					},
+					function() {
+						// All Sets
+						saveSet('AllSets', allSets, allSetsWithExtras, this);
+					},
+					function() {
+						// All Sets Array
+						var allSetsArray = [];
+						var allSetsWithExtrasArray = [];
+
+						console.log("- Generating allSetsArray");
+
+						Object.keys(allSets).forEach(function(key) {
+							allSetsArray.push(allSets[key]);
 						});
-					});
+						Object.keys(allSetsWithExtras).forEach(function(key) {
+							allSetsWithExtrasArray.push(allSetsWithExtras[key]);
+						});
 
-					// Save individual set
-					tiptoe(
-						function() {
-							saveSet(set, regSet, fullSet, this);
-						},
-						function() {
-							if (set == 'CON')
-								saveSet('_CON', regSet, fullSet, this);
-							else
-								this();
-						},
-						function(err) {
-							allSets[set] = regSet;
-							allSetsWithExtras[set] = fullSet;
+						saveSet('AllSetsArray', allSetsArray, allSetsWithExtrasArray, this);
+					},
+					function() {
+						console.log("- Generating allCards");
+						// All Cards
+						var allCards = {};
+						var allCardsWithExtras = {};
 
-							callback(err);
-						}
-					);
-				},
-				function() {
-					// Save all sets
-					tiptoe(
-						function() {
-							// All Sets
-							saveSet('AllSets', allSets, allSetsWithExtras, this);
-						},
-						function() {
-							// All Sets Array
-							var allSetsArray = [];
-							var allSetsWithExtrasArray = [];
-
-							Object.keys(allSets).forEach(function(key) {
-								allSetsArray.push(allSets[key]);
+						// Each set...
+						Object.keys(allSetsWithExtras).forEach(function(setCode) {
+							// Each card...
+							allSetsWithExtras[setCode].cards.forEach(function(card) {
+								if (!allCardsWithExtras.hasOwnProperty(card.name)) {
+									allCardsWithExtras[card.name] = card;
+									allCards[card.name] = stripCardInfo(card);
+								}
 							});
-							Object.keys(allSetsWithExtras).forEach(function(key) {
-								allSetsWithExtrasArray.push(allSetsWithExtras[key]);
-							});
+						});
 
-							saveSet('AllSetsArray', allSetsArray, allSetsWithExtrasArray, this);
-						},
-						function() {
-							// All Cards
-							this();
-						},
-						function (err) {
-							self(err);
-						}
-					);
-				});
+						// Save
+						saveSet('AllCards', allCards, allCardsWithExtras, this);
+					},
+					function (err) {
+						if (!err)
+							console.log('- Done saving JSON.');
+						self(err);
+					}
+				);
 			},
 			function (err) {
 				if (err) {
