@@ -14,7 +14,8 @@ var base = require("xbase"),
 	urlUtil = require("xutil").url,
 	url = require("url"),
 	unicodeUtil = require("xutil").unicode,
-	zlib = require("zlib");
+	zlib = require("zlib"),
+	merge = require('merge');
 
 exports.getSetsToDo = function(startAt)
 {
@@ -507,10 +508,9 @@ exports.performSetCorrections = function(setCorrections, fullSet)
 };
 
 exports.generateCacheFilePath = generateCacheFilePath;
-function generateCacheFilePath(targetUrl)
-{
+function generateCacheFilePath(targetUrl) {
 	var urlHash = hash("whirlpool", targetUrl) + ".gz";
-	return  path.join(__dirname, "..", "cache", urlHash.charAt(0), urlHash);
+	return (path.join(exports.config.cache, urlHash.charAt(0), urlHash);
 }
 
 exports.finalizePrintings = finalizePrintings;
@@ -913,9 +913,7 @@ exports.loadConfig = function(callback) {
 		},
 		function(data) {
 			var config = JSON.parse(data);
-			Object.keys(config).forEach(function(key) {
-				exports.config[key] = config[key];
-			});
+			merge(exports.config, config);
 		},
 		function(err) {
 			if (callback)
