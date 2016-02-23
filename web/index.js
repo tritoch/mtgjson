@@ -492,6 +492,11 @@ var exports = {};
 					},
 					this
 				);
+
+				// TODO: This.
+				//runUtil.run("zip", ["-9", "AllSetFiles.zip"].concat(C.SETS.map(function(SET) { return SET.code + ".json"; })), { cwd:  path.join(__dirname, "json"), silent : true }, this.parallel());
+				//runUtil.run("zip", ["-9", "AllSetFiles-x.zip"].concat(C.SETS.map(function(SET) { return SET.code + "-x.json"; })), { cwd:  path.join(__dirname, "json"), silent : true }, this.parallel());
+				//runUtil.run("zip", ["-9", "AllSetFilesWindows.zip"].concat(C.SETS.map(function(SET) { return (SET.code==="CON" ? "_" : "") + SET.code + ".json"; })), { cwd:  path.join(__dirname, "json"), silent : true }, this.parallel());				
 			},
 			function (err) {
 				if (err) {
