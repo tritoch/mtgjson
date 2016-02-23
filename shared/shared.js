@@ -510,7 +510,7 @@ exports.performSetCorrections = function(setCorrections, fullSet)
 exports.generateCacheFilePath = generateCacheFilePath;
 function generateCacheFilePath(targetUrl) {
 	var urlHash = hash("whirlpool", targetUrl) + ".gz";
-	return (path.join(exports.config.cache, urlHash.charAt(0), urlHash);
+	return (path.join(exports.config.cache, urlHash.charAt(0), urlHash));
 }
 
 exports.finalizePrintings = finalizePrintings;
