@@ -1,38 +1,5 @@
 'use strict';
 
-Array.prototype.forEachCallback = function(callback, finishCallback) {
-	var current = 0;
-	var self = this;
-
-	function next(err) {
-		if (err) {
-			console.error("Something is wrong on forEachCallback().");
-			console.error(err);
-		}
-
-		if (!self) {
-			console.log("Something went wrong...");
-			throw('No self!');
-			return;
-		}
-		if (current >= self.length) {
-			if (finishCallback) {
-				var cb = finishCallback.bind(self);
-				cb(err);
-			}
-			return;
-		}
-
-		var currentItem = self[current++];
-		
-		var cb = callback.bind(currentItem);
-		cb(currentItem, next);
-	}
-
-	// Start!
-	next();
-};
-
 var exports = {};
 
 (function(exports) {
@@ -47,6 +14,8 @@ var exports = {};
 	var runUtil = require("xutil").run;
 	var base = require('xbase');
 	var tiptoe = require('tiptoe');
+	var async = require('async');
+	var stringifyToFile = require('stringifytofile');
 	var zlib = require('zlib');
 	var gzip = zlib.createGzip('level=9');
 
@@ -91,7 +60,8 @@ var exports = {};
 			return(allData);
 
 		allData = {};
-		C.SETS.forEachCallback(
+		async.eachSeries(
+			C.SETS, 
 			function(SET, cb) {
 				fs.readFile(path.join(exports.jsonPath, SET.code + ".json"), { encoding : "utf8" }, function(err, data) {
 					allData[SET.code] = JSON.parse(data);
@@ -120,64 +90,80 @@ var exports = {};
 		var outPath = path.join(exports.outputPath, 'json', setCode);
 		var size = 0, fullSize = 0;
 
-		// Save file and create a GZ version to go along...
-		var saveFile = function(filename, data, callback) {
-			tiptoe(
-				function() {
-					// Save regular file
-					fs.writeFile(filename, data, { encoding: 'utf8' }, this);
-				},
-				function() {
-					// Compress
-					zlib.gzip(data, this);
-				},
-				function(buffer) {
-					// Save compressed
-					fs.writeFile(filename + '.gz', buffer, this);
-				},
-				function() {
-					if (filename.match(/\.json$/)) {
-						// Create ZIP version for JSON files
-						runUtil.run(
-							"zip",
-							["-9", filename + '.zip', filename],
-							{
-								cwd    : path.join(exports.outputPath, 'json'),
-								silent : true
-							},
-							this);
-					}
-					else
-						this();
-				},
-				callback
-			);
+		var compressJSON = function(fn, cb) {
+			var inp = fs.createReadStream(fn);
+			var out = fs.createWriteStream(fn + '.gz');
+
+			var gzip = zlib.createGzip('level=9');
+
+			inp.pipe(gzip).pipe(out);
+
+			out.on('close', cb);
 		};
 
+		var jsonFN = outPath + '.json';
+		var jsonFullFN = outPath + '-x.json';
 		tiptoe(
 			function() {
-				var out = JSON.stringify(regularSet);
-				size = printUtil.toSize(out.length, 0);
-				saveFile(outPath + '.json', out, this);
+				//var out = JSON.stringify(regularSet);
+				//size = printUtil.toSize(out.length, 0);
+				stringifyToFile(jsonFN, regularSet, null, null, this);
+				//saveFile(outPath + '.json', out, this);
+			},
+			function(_size) {
+				size = _size;
+				// Compress
+				compressJSON(jsonFN, this);
 			},
 			function() {
-				if (fullSet) {
-					var out = JSON.stringify(fullSet);
-					fullSize = printUtil.toSize(out.length, 0);
-					saveFile(outPath + '-x.json', out, this);
+				var self = this;
+				
+				// jsonp
+				var stream = fs.createWriteStream(jsonFN + 'p', { flags: 'w' });
+				stream.write(JSONP_PREFIX);
+
+				// This is not really smart. We should use the already-generated JSON file.
+				stringifyToFile.stream(stream, regularSet, null, null, function() {
+					stream.write(', "' + setCode + '"' + JSONP_SUFFIX);
+					stream.end();
+					self();
+				});
+			},
+			function() {
+				// Compress JSONP
+				compressJSON(jsonFN + 'p', this);
+			},
+			/** FULL SET **/
+			function() {
+				if (!fullSet) {
+					this();
+					return;
 				}
-				else
-					this();
+
+				stringifyToFile(jsonFullFN, fullSet, null, null, this);
 			},
-			// JSONP
-			function() {
-				saveFile(outPath + '.jsonp', jsonp(JSON.stringify(regularSet)), this);
+			function(_size) {
+				fullSize = _size;
+				// Compress
+				compressJSON(jsonFullFN, this);
 			},
 			function() {
-				if (fullSet)
-					saveFile(outPath + '-x.jsonp', jsonp(JSON.stringify(fullSet)), this);
-				else
-					this();
+				var self = this;
+				
+				// jsonp
+				var stream = fs.createWriteStream(jsonFullFN + 'p', { flags: 'w' });
+				stream.write(JSONP_PREFIX);
+
+				// This is not really smart. We should use the already-generated JSON file.
+				stringifyToFile.stream(stream, fullSet, null, null, function() {
+					stream.write(', "' + setCode + '"' + JSONP_SUFFIX);
+					stream.end();
+					self();
+				});
+			},
+			function() {
+				// Compress JSONP
+				compressJSON(jsonFullFN + 'p', this);
 			},
 			function(err) {
 				if (callback)
@@ -320,7 +306,7 @@ var exports = {};
 				tiptoe(
 					function() {
 						// Populate allSets and allSetsWithExtras
-						Object.keys(sets).forEachCallback(function(set, callback) {
+						async.eachSeries(Object.keys(sets), function(set, callback) {
 							var fullSet = sets[set];
 
 							// Preliminar dust set data

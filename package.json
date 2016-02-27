@@ -5,12 +5,14 @@
   "description": "Provides MTG JSON files",
   "private": true,
   "dependencies": {
+    "async": "^1.5.2",
     "cli-color": ">= 0.2.3",
     "domino": ">= 1.0.19",
     "merge": "^1.2.0",
     "mhash": ">= 2.0.2",
     "moment": ">= 2.10.6",
     "rimraf": ">= 2.4.2",
+    "stringifytofile": "git+https://github.com/lsmoura/stringifytofile.git",
     "tiptoe": ">= 1.0.0",
     "xbase": "git://github.com/Sembiance/xbase.git",
     "xutil": "git://github.com/Sembiance/xutil.git"
