@@ -2952,7 +2952,8 @@
       "originalText": "Sandblast deals 5 damage to target attacking or blocking creature.",
       "originalType": "Instant",
       "printings": [
-        "FRF"
+        "FRF",
+        "HOU"
       ],
       "rarity": "Common",
       "text": "Sandblast deals 5 damage to target attacking or blocking creature.",
@@ -21703,7 +21704,8 @@
         "PCA",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -22056,7 +22058,8 @@
         "PCA",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -22407,7 +22410,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -22758,7 +22762,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -23114,7 +23119,8 @@
         "PCA",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -23470,7 +23476,8 @@
         "PCA",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -23827,7 +23834,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -24184,7 +24192,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -24539,7 +24548,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -24894,7 +24904,8 @@
         "DDS",
         "AKH",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [

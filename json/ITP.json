@@ -1338,7 +1338,8 @@
         "C16",
         "PCA",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -1872,7 +1873,8 @@
         "C16",
         "PCA",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -2412,7 +2414,8 @@
         "C16",
         "PCA",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -2941,7 +2944,8 @@
         "C16",
         "PCA",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -3710,7 +3714,8 @@
         "C16",
         "PCA",
         "CMA",
-        "E01"
+        "E01",
+        "HOU"
       ],
       "rarity": "Basic Land",
       "subtypes": [
@@ -3914,7 +3919,8 @@
         "DPA",
         "M11",
         "M12",
-        "M13"
+        "M13",
+        "HOU"
       ],
       "rarity": "Special",
       "text": "Return target creature to its owner's hand.",
